@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini Chatbot</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <h2>Gemini Chat</h2>
+        <button id="newChatBtn" class="icon-btn" title="New chat">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+      <div id="historyList"></div>
+      <div class="sidebar-footer">
+        <button id="deleteAllBtn" class="sidebar-btn danger">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Delete all chats
+        </button>
+      </div>
+    </aside>
+
+    <main id="main">
+      <header id="header">
+        <button id="menuToggle" class="icon-btn" title="Toggle sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <h1>Gemini Chatbot</h1>
+        <div class="header-spacer"></div>
+      </header>
+
+      <div id="chatContainer">
+        <div id="welcome">
+          <div class="welcome-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <h2>How can I help you today?</h2>
+          <div class="suggestions">
+            <button class="suggestion-chip" data-prompt="Explain quantum computing in simple terms">Explain quantum computing</button>
+            <button class="suggestion-chip" data-prompt="Write a Python function to sort a list">Write Python sort function</button>
+            <button class="suggestion-chip" data-prompt="What are the best practices for REST API design?">REST API best practices</button>
+            <button class="suggestion-chip" data-prompt="Create a meal plan for a week">Create a meal plan</button>
+          </div>
+        </div>
+        <div id="messages"></div>
+        <div id="scrollAnchor"></div>
+      </div>
+
+      <div id="inputArea">
+        <div id="inputWrapper">
+          <textarea id="userInput" rows="1" placeholder="Message Gemini..." aria-label="Message input"></textarea>
+          <button id="sendBtn" class="icon-btn send-btn" disabled aria-label="Send message">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+        <p class="disclaimer">Gemini can make mistakes. Verify important information.</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
