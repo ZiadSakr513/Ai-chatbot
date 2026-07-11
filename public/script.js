@@ -137,7 +137,7 @@ function addMessage(role, text, isStreaming = false) {
 
   const avatar = document.createElement('div');
   avatar.className = 'message-avatar';
-  avatar.textContent = role === 'user' ? 'U' : 'G';
+  avatar.textContent = role === 'user' ? 'U' : 'A';
 
   const content = document.createElement('div');
   content.className = 'message-content';
@@ -168,7 +168,7 @@ function addTypingIndicator() {
 
   const avatar = document.createElement('div');
   avatar.className = 'message-avatar';
-  avatar.textContent = 'G';
+  avatar.textContent = 'A';
 
   const dots = document.createElement('div');
   dots.className = 'typing-dots';
@@ -265,12 +265,12 @@ async function sendMessage() {
   state.isStreaming = true;
   streamingElement = null;
 
-  const contents = [];
+  const messages = [];
   for (const msg of chat.messages) {
     if (msg.role === 'system') continue;
-    contents.push({
-      role: msg.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: msg.text }],
+    messages.push({
+      role: msg.role === 'assistant' ? 'assistant' : 'user',
+      content: msg.text,
     });
   }
 
@@ -280,7 +280,7 @@ async function sendMessage() {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents }),
+      body: JSON.stringify({ messages }),
     });
 
     if (!response.ok) {

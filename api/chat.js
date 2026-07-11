@@ -1,28 +1,19 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+const MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-const API_KEY = process.env.GROQ_API_KEY;
-const MODEL = process.env.GROQ_MODEL || 'llama3-70b-8192';
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.static('public'));
-
-app.post('/api/chat', async (req, res) => {
   const { messages, systemInstruction } = req.body;
 
-  if (!API_KEY) {
-    return res.status(500).json({ error: 'Groq API key is not configured. Add GROQ_API_KEY to your .env file.' });
+  if (!process.env.GROQ_API_KEY) {
+    return res.status(500).json({ error: 'Groq API key is not configured. Add GROQ_API_KEY to your Vercel environment variables.' });
   }
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'Invalid request: messages array is required' });
   }
-
-  const url = 'https://api.groq.com/openai/v1/chat/completions';
 
   const groqMessages = [];
   if (systemInstruction) {
@@ -33,11 +24,11 @@ app.post('/api/chat', async (req, res) => {
   }
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`,
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
         model: MODEL,
@@ -61,9 +52,9 @@ app.post('/api/chat', async (req, res) => {
       }
 
       if (!message) {
-        if (status === 400) message = 'Bad request - please check your input and try again.';
-        else if (status === 401 || status === 403) message = 'Invalid API key. Please check your GROQ_API_KEY in .env.';
-        else if (status === 429) message = 'Rate limit exceeded. Please wait a moment and try again.';
+        if (status === 400) message = 'Bad request - please check your input.';
+        else if (status === 401 || status === 403) message = 'Invalid API key. Check GROQ_API_KEY in Vercel env vars.';
+        else if (status === 429) message = 'Rate limit exceeded. Please wait and try again.';
         else if (status >= 500) message = 'Groq API server error. Please try again later.';
         else message = `API error (${status}): ${response.statusText}`;
       }
@@ -74,7 +65,6 @@ app.post('/api/chat', async (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
-    res.setHeader('X-Accel-Buffering', 'no');
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
@@ -98,17 +88,14 @@ app.post('/api/chat', async (req, res) => {
         try {
           const parsed = JSON.parse(payload);
           const choice = parsed.choices?.[0];
-          const text = choice?.delta?.content || choice?.delta?.text || '';
+          const text = choice?.delta?.content || '';
 
           if (text) {
             sendEvent({ text });
           }
 
-          if (choice?.finish_reason && choice.finish_reason !== 'null' && choice.finish_reason !== null) {
-            const reason = choice.finish_reason;
-            if (reason !== 'stop') {
-              sendEvent({ warning: `Response ${reason.toLowerCase()}. It may be incomplete.` });
-            }
+          if (choice?.finish_reason && choice.finish_reason !== 'null' && choice.finish_reason !== null && choice.finish_reason !== 'stop') {
+            sendEvent({ warning: `Response ${choice.finish_reason.toLowerCase()}. It may be incomplete.` });
           }
         } catch {
           // skip malformed SSE data
@@ -140,16 +127,4 @@ app.post('/api/chat', async (req, res) => {
     res.write(`data: ${JSON.stringify({ error: 'Network error - response may be incomplete.' })}\n\n`);
     res.end();
   }
-});
-
-app.use((err, _req, res, _next) => {
-  console.error('Unhandled error:', err);
-  res.status(500).json({ error: 'Internal server error' });
-});
-
-app.listen(PORT, () => {
-  console.log(`Chatbot running at http://localhost:${PORT}`);
-  if (!API_KEY) {
-    console.warn('WARNING: GROQ_API_KEY not set. Copy .env.example to .env and add your key.');
-  }
-});
+};
