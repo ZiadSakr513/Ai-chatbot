@@ -1,14 +1,4 @@
 {
   "version": 2,
-  "buildCommand": null,
-  "outputDirectory": "public",
-  "functions": {
-    "api/chat.js": {
-      "maxDuration": 30
-    }
-  },
-  "routes": [
-    { "src": "/api/chat", "dest": "/api/chat" },
-    { "src": "/(.*)", "dest": "/public/$1" }
-  ]
+  "framework": null
 }
