@@ -6,7 +6,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
-  "dependencies": {
+  "devDependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0"
